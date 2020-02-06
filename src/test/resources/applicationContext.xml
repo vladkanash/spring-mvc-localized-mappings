@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="mappings"/>
+    </bean>
+
+    <bean class="handler.LocalizedRequestMappingHandlerMapping">
+        <constructor-arg name="messageSource" ref="messageSource"/>
+        <constructor-arg name="supportedLocales">
+            <list value-type="java.util.Locale">
+                <util:constant static-field="java.util.Locale.FRENCH"/>
+                <util:constant static-field="java.util.Locale.ENGLISH"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>

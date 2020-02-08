@@ -7,7 +7,7 @@
         <property name="basename" value="mappings"/>
     </bean>
 
-    <bean class="handler.LocalizedRequestMappingHandlerMapping">
+    <bean class="request.handler.LocalizedRequestMappingHandlerMapping">
         <constructor-arg name="messageSource" ref="messageSource"/>
         <constructor-arg name="supportedLocales">
             <list value-type="java.util.Locale">

@@ -1,10 +1,11 @@
 package config;
 
-import handler.LocalizedRequestMappingHandlerMapping;
+import request.handler.LocalizedRequestMappingHandlerMapping;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -34,11 +35,23 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
     @Bean
     public InternalResourceViewResolver setupViewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("/WEB-INF/pages/");
+        var resolver = new InternalResourceViewResolver();
+        resolver.setPrefix("/WEB-INF/views/");
         resolver.setSuffix(".jsp");
         resolver.setViewClass(JstlView.class);
 
         return resolver;
+    }
+
+    @Bean
+    public List<Locale> supportedLocales() {
+        return List.of(Locale.US, Locale.FRANCE);
+    }
+
+    @Bean
+    public MessageSource messageSource() {
+        var messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("mappings");
+        return messageSource;
     }
 }

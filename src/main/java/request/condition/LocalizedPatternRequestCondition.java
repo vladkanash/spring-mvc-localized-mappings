@@ -1,4 +1,4 @@
-package condition;
+package request.condition;
 
 import org.springframework.web.servlet.mvc.condition.AbstractRequestCondition;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
@@ -25,7 +25,9 @@ public class LocalizedPatternRequestCondition extends AbstractRequestCondition<P
 
     @Override
     public PatternsRequestCondition getMatchingCondition(HttpServletRequest request) {
-        return getLocalePatternCondition(request).orElse(null);
+        return getLocalePatternCondition(request)
+                .map(condition -> condition.getMatchingCondition(request))
+                .orElse(null);
     }
 
     @Override

@@ -20,11 +20,13 @@ def junitVersion = '5.5.1'
 dependencies {
 
     implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    implementation group: 'javax.servlet.jsp', name: 'jsp-api', version: '2.1'
+    implementation group: 'javax.servlet.jsp.jstl', name: 'jstl-api', version: '1.2'
+
     implementation group: 'org.springframework', name: 'spring-core', version: springVersion
     implementation group: 'org.springframework', name: 'spring-webmvc', version: springVersion
 
-    implementation localGroovy()
-
+    testImplementation localGroovy()
     testImplementation group: 'org.springframework', name: 'spring-test', version: springVersion
     testImplementation group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion

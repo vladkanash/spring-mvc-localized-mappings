@@ -24,28 +24,28 @@ class HomepageControllerTest {
     @Test
     void shouldProcessSimpleUSRequest() {
         mockMvc.perform(get('/homepage')
-                .locale(Locale.US))
+                .locale(Locale.ENGLISH))
                 .andExpect(status().isOk())
     }
 
     @Test
     void shouldProcessInvalidUSRequest() {
         mockMvc.perform(get('/hogar')
-                .locale(Locale.US))
+                .locale(Locale.ENGLISH))
                 .andExpect(status().isNotFound())
     }
 
     @Test
     void shouldProcessSimpleFRRequest() {
         mockMvc.perform(get('/hogar')
-                .locale(Locale.FRANCE))
+                .locale(Locale.FRENCH))
                 .andExpect(status().isOk())
     }
 
     @Test
     void shouldProcessRootRequest() {
         mockMvc.perform(get('/')
-                .locale(Locale.FRANCE))
+                .locale(Locale.FRENCH))
                 .andExpect(status().isNotFound())
     }
 }

@@ -1,33 +1,30 @@
 package request.handler;
 
-import request.annotation.LocalizedRequestMapping;
-import request.condition.LocalizedPatternRequestCondition;
-import org.springframework.context.MessageSource;
-import org.springframework.context.NoSuchMessageException;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.servlet.mvc.condition.AbstractRequestCondition;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import request.annotation.LocalizedRequestMapping;
+import request.condition.LocalizedPatternRequestCondition;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Properties;
+
+import static java.util.stream.Collectors.toMap;
 
 public class LocalizedRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 
-    private final MessageSource messageSource;
-
-    private final List<Locale> supportedLocales;
+    private final Properties mappings;
+    private final String basename;
 
     private RequestMappingInfo.BuilderConfiguration config = new RequestMappingInfo.BuilderConfiguration();
 
-    public LocalizedRequestMappingHandlerMapping(MessageSource messageSource, List<Locale> supportedLocales) {
-        this.messageSource = messageSource;
-        this.supportedLocales = supportedLocales;
+    public LocalizedRequestMappingHandlerMapping(Properties properties, String basename) {
+        this.mappings = properties;
+        this.basename = basename;
     }
 
     @Override
@@ -54,29 +51,23 @@ public class LocalizedRequestMappingHandlerMapping extends RequestMappingHandler
     }
 
     private Map<Locale, PatternsRequestCondition> getPatternConditionMap(LocalizedRequestMapping localizedMapping) {
-        return getLocalizedPatterns(localizedMapping.code())
+        return loadLocalizedPatterns(localizedMapping.code())
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().length > 0)
-                .collect(Collectors.toMap(
+                .collect(toMap(
                         Map.Entry::getKey,
                         entry -> createPatternsRequestCondition(entry.getValue())));
     }
 
-    private Map<Locale, String[]> getLocalizedPatterns(String code) {
-        return this.supportedLocales.stream()
-                .collect(Collectors.toMap(
-                        Function.identity(),
-                        locale -> getPatternsForLocale(code, locale)));
-
-    }
-
-    private String[] getPatternsForLocale(String code, Locale locale) {
-        try {
-            return new String[]{messageSource.getMessage(code, null, locale)};
-        } catch (NoSuchMessageException nsme) {
-            return new String[0];
-        }
+    private Map<Locale, String[]> loadLocalizedPatterns(String code) {
+        var mappingBaseName = this.basename + "." + code;
+        return mappings.stringPropertyNames()
+                .stream()
+                .filter(key -> key.startsWith(mappingBaseName))
+                .collect(toMap(
+                        key -> Locale.forLanguageTag(key.substring(mappingBaseName.length() + 1)),
+                        key -> new String[]{mappings.getProperty(key)}));
     }
 
     private PatternsRequestCondition createPatternsRequestCondition(String[] paths) {

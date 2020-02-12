@@ -1,30 +1,31 @@
 package config;
 
-import request.handler.LocalizedRequestMappingHandlerMapping;
-import org.springframework.context.MessageSource;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
+import request.handler.LocalizedRequestMappingHandlerMapping;
 
-import java.util.List;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.Properties;
 
 @Configuration
 @EnableWebMvc
 @ComponentScan("controller")
 public class WebConfig extends WebMvcConfigurationSupport {
 
-    @Bean
-    public RequestMappingHandlerMapping requestMappingHandlerMapping(
-            MessageSource messageSource, List<Locale> supportedLocales) {
+    private final static String MAPPINGS_BASENAME = "mappings";
 
-        var handlerMapping = new LocalizedRequestMappingHandlerMapping(messageSource, supportedLocales);
+    @Bean
+    public RequestMappingHandlerMapping requestMappingHandlerMapping(Properties mappingProperties) {
+
+        var handlerMapping = new LocalizedRequestMappingHandlerMapping(mappingProperties, MAPPINGS_BASENAME);
 
         handlerMapping.setOrder(0);
         handlerMapping.setDetectHandlerMethodsInAncestorContexts(true);
@@ -44,14 +45,10 @@ public class WebConfig extends WebMvcConfigurationSupport {
     }
 
     @Bean
-    public List<Locale> supportedLocales() {
-        return List.of(Locale.US, Locale.FRANCE);
-    }
-
-    @Bean
-    public MessageSource messageSource() {
-        var messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("mappings");
-        return messageSource;
+    public Properties mappingProperties() throws IOException {
+        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
+        propertiesFactoryBean.setLocation(new ClassPathResource("mappings.properties"));
+        propertiesFactoryBean.afterPropertiesSet();
+        return propertiesFactoryBean.getObject();
     }
 }

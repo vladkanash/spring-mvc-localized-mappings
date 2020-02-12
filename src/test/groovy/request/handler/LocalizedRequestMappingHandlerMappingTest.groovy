@@ -21,14 +21,6 @@ class LocalizedRequestMappingHandlerMappingTest {
         assert actual?.content?.size() == 2
     }
 
-    @Test
-    void shouldCreateEmptyConditionIfNo() {
-        def method = getTestMethod("simpleMapping1")
-        def actual = testedInstance.getCustomMethodCondition(method)
-
-        assert actual?.content?.size() == 2
-    }
-
     private static Method getTestMethod(String name) {
         return TestController.class.getMethod(name, null)
     }
